@@ -1,0 +1,36 @@
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Least privilege: the jobs only need to read the repo.
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # scan full history, not just the last commit
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  semgrep:
+    name: semgrep
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Static analysis
+        run: semgrep scan --config p/default --error --metrics=off
+
+  # Dependency scan: this repo has no dependencies, so it is left out here.
+  # In a project with a lockfile, add OSV-Scanner or `npm audit` / `pip audit`
+  # as a third job and make it required in branch protection.
