@@ -23,7 +23,7 @@ The agent builds on its own and runs security checks in the background after eve
 ## Quick start
 
 1. Copy `AGENTS.md` into the root of your project.
-2. Copy `CLAUDE.md` too if you use Claude Code. It just points to `AGENTS.md`, so you keep one source of truth.
+2. Copy `CLAUDE.md` too if you use Claude Code. It just points to `AGENTS.md`, so you keep one source of truth. Also copy `.claude/settings.json` to get the hard blocks.
 3. For tools that don't read `AGENTS.md` automatically, point their rules file at it.
 4. **Enforce it in CI** (see below). This step matters most.
 
@@ -31,6 +31,8 @@ The agent builds on its own and runs security checks in the background after eve
 
 - `AGENTS.md`: the rules. Written for the AI, not for humans.
 - `CLAUDE.md`: one line that tells Claude Code to follow `AGENTS.md`.
+- `.claude/settings.json`: hard blocks for Claude Code. Denies reading `.env` and secrets, `rm -rf`, and force-push. Asks before `git push` and package installs. This is a seatbelt, not a vault: command patterns can be worked around, so don't rely on it alone.
+- `.github/workflows/security.yml`: GitHub Action that runs secret scanning (gitleaks) and static analysis (Semgrep) on every push and pull request. Add a dependency scan once your project has a lockfile.
 
 ## Important: rules are not a guarantee
 
